@@ -40,10 +40,10 @@ ascanio-post1-u11/
 
 > **Nota de entorno:** El equipo local de desarrollo dispone de GPU integrada AMD (sin soporte CUDA), por lo que la compilación y ejecución de los programas CUDA se realiza en **Google Colab** con entorno **GPU T4** (*Runtime → Change runtime type → T4 GPU*).
 
-- **GPU:** `[COMPLETAR con salida de nvidia-smi en Colab, ej. NVIDIA Tesla T4 15 GB]`
-- **Versión de CUDA:** `[COMPLETAR con salida de nvcc --version, ej. CUDA 12.x]`
-- **Sistema Operativo:** `[COMPLETAR, ej. Ubuntu 22.04 LTS (Google Colab)]`
-- **Compilador Host:** `[COMPLETAR con gcc --version]`
+- **GPU:** `NVIDIA Tesla T4` (`15 360 MiB`, Compute Capability `7.5`, Driver `580.82.07`)
+- **Versión de CUDA:** `CUDA 13.0` (`nvcc release 13.0, V13.0.88`)
+- **Sistema Operativo:** `Ubuntu 24.04.4 LTS` (Google Colab)
+- **Compilador Host:** `gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0`
 
 ### Comandos de Compilación y Ejecución
 
@@ -73,23 +73,23 @@ nvcc -O2 -o vectorAddStream src/vectorAddStream.cu
 
 | Tamaño `N` | CPU (ms) | GPU Kernel (ms) | GPU Total con `cudaMemcpy` (ms) | Speedup (CPU / GPU Kernel) | Errores |
 | :--- | :---: | :---: | :---: | :---: | :---: |
-| `1M` (`1 048 576`) | `[COMPLETAR]` | `[COMPLETAR]` | `[COMPLETAR]` | `[COMPLETAR]` | `[COMPLETAR]` |
-| `4M` (`4 194 304`) | `[COMPLETAR]` | `[COMPLETAR]` | `[COMPLETAR]` | `[COMPLETAR]` | `[COMPLETAR]` |
-| `16M` (`16 777 216`) | `[COMPLETAR]` | `[COMPLETAR]` | `[COMPLETAR]` | `[COMPLETAR]` | `[COMPLETAR]` |
+| `1M` (`1 048 576`) | `2.96` | `0.10` | `6.70` | `29.60×` | `0` |
+| `4M` (`4 194 304`) | `12.89` | `0.20` | `22.81` | `64.45×` | `0` |
+| `16M` (`16 777 216`) | `51.61` | `0.76` | `89.72` | `67.91×` | `0` |
 
 ### 4.2 `matMul` — Naïve vs *Tiling* en *Shared Memory* (`N = 512, 1024`)
 
 | Dimensión `N × N` | CPU (ms) | Kernel Naïve (ms) | Kernel Tiled (`TILE=16`) (ms) | Speedup (Naïve / Tiled) | Errores (`< 1e-3`) |
 | :--- | :---: | :---: | :---: | :---: | :---: |
-| `512 × 512` | `[COMPLETAR]` | `[COMPLETAR]` | `[COMPLETAR]` | `[COMPLETAR]` | `[COMPLETAR]` |
-| `1024 × 1024` | `[COMPLETAR]` | `[COMPLETAR]` | `[COMPLETAR]` | `[COMPLETAR]` | `[COMPLETAR]` |
+| `512 × 512` | `205.73` | `0.98` | `0.59` | `1.65×` | `0` |
+| `1024 × 1024` | `3517.38` | `9.18` | `5.80` | `1.58×` | `0` |
 
 ### 4.3 `vectorAddStream` — Transferencia Síncrona vs 4 Streams (`N = 16M`)
 
 | Modo de Ejecución | Tiempo Total H2D + Kernel + D2H (ms) | Reducción (%) | Errores |
 | :--- | :---: | :---: | :---: |
-| Síncrono (`cudaMemcpy` bloqueante) | `[COMPLETAR]` | — | `[COMPLETAR]` |
-| Asíncrono con 4 Streams (`cudaHostAlloc` + `cudaMemcpyAsync`) | `[COMPLETAR]` | `[COMPLETAR]` | `[COMPLETAR]` |
+| Síncrono (`cudaMemcpy` bloqueante con memoria *pinned*) | `17.01` | — | `0` |
+| Asíncrono con 4 Streams (`cudaHostAlloc` + `cudaMemcpyAsync`) | `13.05` | `23.3%` | `0` |
 
 ---
 
@@ -105,11 +105,11 @@ Por el contrario, cuando `N` es pequeño (por ejemplo `1M` o menos), el tiempo t
 
 | Checkpoint | Descripción | Archivo de Evidencia |
 | :--- | :--- | :--- |
-| Checkpoint 1 | Compilación y ejecución de `vectorAdd` (`Errores: 0`) | `capturas/CP1_vectorAdd.png` *(pendiente captura Colab)* |
-| Checkpoint 2 | Compilación y ejecución de `matMul` (naïve vs *tiled*) | `capturas/CP2_matMul.png` *(pendiente captura Colab)* |
-| Checkpoint 3 | Verificación de entorno (`nvidia-smi`, `nvcc --version`) | `capturas/CP3_entorno_colab.png` *(pendiente captura Colab)* |
-| Checkpoint 4 | Ejecución de `vectorAddStream` (síncrono vs 4 streams) | `capturas/CP4_vectorAddStream.png` *(pendiente captura Colab)* |
-| Checkpoint 5 | Decisiones técnicas de la Parte 1 y revisión de repositorio | `capturas/CP5_git_log.png` *(pendiente captura)* |
+| Checkpoint 1 | Compilación y ejecución de `vectorAdd` (`Errores: 0`) | [`CP1_vectorAdd.png`](capturas/CP1_vectorAdd.png) |
+| Checkpoint 2 | Compilación y ejecución de `matMul` (naïve vs *tiled*) | [`CP2_matMul.png`](capturas/CP2_matMul.png) |
+| Checkpoint 3 | Verificación de entorno (`nvidia-smi`, `nvcc --version`, `gcc`, OS) | [`CP3_entorno_colab.png`](capturas/CP3_entorno_colab.png) |
+| Checkpoint 4 | Ejecución de `vectorAddStream` (síncrono vs 4 streams) | [`CP4_vectorAddStream.png`](capturas/CP4_vectorAddStream.png) |
+| Checkpoint 5 | Historial de commits y verificación de estructura del repositorio | [`CP5_git_log.png`](capturas/CP5_git_log.png) |
 
 ---
 
