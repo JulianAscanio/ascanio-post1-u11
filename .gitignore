@@ -1,0 +1,11 @@
+# Binarios compilados
+vectorAdd
+matMul
+vectorAddStream
+bin/
+*.o
+*.out
+
+# Temporales
+*.tmp
+.DS_Store
